@@ -4,4 +4,4 @@ Bash scripts to setup and restore DHIS2 databases from https://github.com/dhis2/
 
 These scritps are intended for **development purposes** only and only work on a local database.
 
-When running the scripts in Linux, elevate to postgres user first (`sudo -i -u postgres`)
+When running the scripts in Linux, elevate to postgres user first (`sudo -i -u postgres`).
