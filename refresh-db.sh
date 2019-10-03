@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Fetches a database dump from https://github.com/dhis2/dhis2-demo-db/tree/master/sierra-leone
 # and restores it it on a local postgres instance
@@ -11,27 +11,30 @@
 #
 # ./refresh-db.sh 2.32
 #
+set -e
+set -u
+
 if [[ $# -ne 1 ]]; then
     echo "Please, specify dhis2 version (2.33, 2.32, etc.)"
     exit 2
 fi
 
-tmp_dir=$(mktemp -d -t ci-$(date +%Y-%m-%d-%H-%M-%S)-dhis2-db)
+tmp_dir=$(mktemp -d)
 url=https://raw.githubusercontent.com/dhis2/dhis2-demo-db/master/sierra-leone/$1/dhis2-db-sierra-leone.sql.gz
 db_version=${1/./_}
 db=dhis2_${db_version}
 
 if ! wget -q --method=HEAD $url;
 then
-  echo "There is no database with version: " ${1} 
+  echo "There is no database with version: " ${1}
   exit 2
 fi
 
 # fetch the database
-wget -P $tmp_dir $url 
+wget -P $tmp_dir $url
 gunzip $tmp_dir/dhis2-db-sierra-leone.sql.gz
 
-# create database 
+# create database
 psql postgres << END_OF_SCRIPT
 
 DROP DATABASE $db;

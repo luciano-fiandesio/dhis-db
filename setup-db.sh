@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 #
-# Creates a Postgres role 'dhis' required for restoring DHIS2 databases from 
+# Creates a Postgres role 'dhis' required for restoring DHIS2 databases from
 # https://github.com/dhis2/dhis2-demo-db/tree/master/sierra-leone
 
 psql postgres << END_OF_SCRIPT
