@@ -11,18 +11,30 @@
 #
 # ./refresh-db.sh 2.32
 #
+# This will create a database with the name 'dhis2_2_32'
+#
+# It is possible to pass the database name as second argument:
+#
+#
+# ./refresh-db.sh 2.32 test_2_32
+#
+
 set -e
 set -u
 
-if [[ $# -ne 1 ]]; then
-    echo "Please, specify dhis2 version (2.33, 2.32, etc.)"
-    exit 2
+DB_VERSION=$1
+
+if [[ -z $DB_VERSION ]];
+then
+	echo "Please, specify a DHIS2 database version (2.33, 2.32, etc.)"
+	exit 2
 fi
+
+DB_NAME=${2:-dhis2_${1/./_}}
+
 
 tmp_dir=$(mktemp -d)
 url=https://raw.githubusercontent.com/dhis2/dhis2-demo-db/master/sierra-leone/$1/dhis2-db-sierra-leone.sql.gz
-db_version=${1/./_}
-db=dhis2_${db_version}
 
 if ! wget -q --method=HEAD $url;
 then
@@ -37,13 +49,13 @@ gunzip $tmp_dir/dhis2-db-sierra-leone.sql.gz
 # create database
 psql postgres << END_OF_SCRIPT
 
-DROP DATABASE $db;
+DROP DATABASE IF EXISTS $DB_NAME;
 
-CREATE DATABASE $db;
+CREATE DATABASE $DB_NAME;
 
-GRANT ALL PRIVILEGES ON DATABASE $db TO dhis;
+GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO dhis;
 
-\c $db
+\c $DB_NAME
 
 CREATE EXTENSION postgis;
 
@@ -51,7 +63,7 @@ CREATE EXTENSION postgis;
 
 END_OF_SCRIPT
 
-psql $db < $tmp_dir/dhis2-db-sierra-leone.sql
+psql $DB_NAME < $tmp_dir/dhis2-db-sierra-leone.sql
 
 rm -fr $tmp_dir
 
